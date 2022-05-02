@@ -92,5 +92,64 @@
             return
         }
     });
+
+    function writeGuess(guess){
+        //build our match array so we easily see what matches
+        let matchArray = buildMatchArray(guess) //todo create function that turns words into arrays
+
+        //identify the current tr tag
+        let currentGuessRow = board.children[currentGuessNumber];
+        //identify the columns for each letter in that row
+        let columns = currentGuessRow.children
+
+        for (let i = 0; i<matchArray.length; i++){
+            let column = columns[i];
+            column.textContent = guess[i].toUpperCase();
+
+            if (matchArray[i] === 2){ //perfect match
+                column.classList.add('correct');
+            } else if (matchArray[i] === 1){ //in word, wrong spot
+                column.classList.add('in-word');
+            }else {
+                column.classList.add('incorrect'); //no match
+            }
+        }
+    }
+
+    function buildMatchArray(guess){
+        guess = guess.toUpperCase();
+        let answerAsArray = [];
+        let matchArray = [0,0,0,0,0]; //assume no match to start
+        for (let i = 0; i < answer.length; i++) {
+            let letter = answer[i].toUpperCase();
+            answerAsArray.push(letter);
+        }
+
+        //todo find exact matches first
+        for (let i = 0; i < guess.length; i++){
+            let letter = guess[i];
+            if (letter === answer[i]){
+                answerAsArray[i] = null; //remove letter to prevent matching it as yellow, too
+                matchArray[i] = 2; //indicate we found a match
+            }
+        }
+
+        //todo find in-word matches and misses
+        for (let i = 0; i<guess.length; i++){
+            let letter = guess[i];
+            let index = answerAsArray.indexOf(letter);
+
+            //if letter not in remaining letters, move on to next letter
+            if(index === -1){
+                continue
+            }
+
+            //remove letter to prevent matching in other positions
+            answerAsArray[index] = null;
+            //mark it yellow as it is in the word but not in the correct spot
+            matchArray[i] = 1
+        }
+        return matchArray
+    }
 </script>
 </html>
